@@ -148,7 +148,7 @@
 <script>
 
     const words = ['snake', 'dog', 'bird', 'horse'];
-
+    import axios from "axios"
     export default {
         name: 'app',
         data() {
