@@ -4,6 +4,7 @@
             <div class="row">
                 <div class="col-xs-4">
                     <pre>Rates : {{rates.length}}</pre>
+                    <pre style="color:red" v-if="!user">Try: {{letter}}</pre>
                 </div>
                 <div class="col-xs-8">
                     <pre v-if="rates.length === 0">
@@ -147,7 +148,6 @@
 <script>
 
     const words = ['snake', 'dog', 'bird', 'horse'];
-    import axios from 'axios';
 
     export default {
         name: 'app',
@@ -160,9 +160,9 @@
                 against: this.wordAtRandom(),
                 lost: false,
                 won: false,
-                user: false,
+                user: true,
                 answer: '',
-
+                letter: '',
             }
         },
         computed: {
@@ -197,9 +197,13 @@
                 this.lost = false;
                 this.won = false;
                 this.against = this.wordAtRandom();
+                clearInterval(this.interval);
             },
             wordAtRandom() {
                 return words[Math.floor(Math.random() * words.length)];
+            },
+            lettersAtRandom(){
+                return this.letters[Math.floor(Math.random() * this.letters.length)];
             },
             role(role){
                 if(role === 'user'){
@@ -210,53 +214,22 @@
             },
             setAnswer(){
                 this.against = this.answer;
-                this.checkWorld();
+                this.repeater()
             },
-            checkWorld(){
-                // const url = 'https://od-api.oxforddictionaries.com:443/api/v2/entries/en-gb/'+ this.answer.toLowerCase();
-                // const options = {
-                //     method: 'GET',
-                //     headers: {
-                //         'app_id': 'dc4282d6',
-                //         'app_key': '281d675436705fe58f038f9b2ce80873',
-                //         'content-type': 'application/json;charset=utf-8'
-                //     },
-                //     url,
-                // };
-                //
-                // axios.get(url, { headers: options.headers})
-                //     .then(response => {
-                //         // If request is good...
-                //         console.log(response.data);
-                //     })
-                //     .catch((error) => {
-                //         console.log('error ' + error);
-                //     });
-                var data = null;
-
-                var xhr = new XMLHttpRequest();
-                xhr.withCredentials = true;
-
-                xhr.addEventListener("readystatechange", function () {
-                    if (this.readyState === 4) {
-                        console.log(this.responseText);
-                    }
-                });
-
-                xhr.open("GET", "https://od-api.oxforddictionaries.com:443/api/v2/entries/en-gb/hello");
-                xhr.setRequestHeader("app_id", "dc4282d6");
-                xhr.setRequestHeader("app_key", "281d675436705fe58f038f9b2ce80873");
-                xhr.setRequestHeader("User-Agent", "PostmanRuntime/7.17.1");
-                xhr.setRequestHeader("Accept", "*/*");
-                xhr.setRequestHeader("Cache-Control", "no-cache");
-                xhr.setRequestHeader("Postman-Token", "9bc84470-56f3-4786-ac48-6aa7bf4003f7,ddec4e2b-681e-427b-abe3-9de77cc9a2e7");
-                xhr.setRequestHeader("Host", "od-api.oxforddictionaries.com:443");
-                xhr.setRequestHeader("Accept-Encoding", "gzip, deflate");
-                xhr.setRequestHeader("Connection", "keep-alive");
-                xhr.setRequestHeader("cache-control", "no-cache");
-
-                xhr.send(data);
-            }
+            repeater (){
+                 self = this;
+                 let callCount = 1;
+                    this.interval = setInterval(function () {
+                     if (self.rates.length < 10 ) {
+                         self.letter = self.lettersAtRandom();
+                         callCount += 1;
+                         self.click(self.letter);
+                         console.log(self.letter);
+                     } else {
+                         clearInterval(self.repeater);
+                     }
+                 }, 2000);
+             }
         }
     }
 </script>
